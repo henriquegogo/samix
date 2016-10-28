@@ -20,20 +20,37 @@ def load_samples(samples):
 
     return bank
 
-def create_music(bank, pattern, bpm):
-    beat_duration = 60000 / 2 / bpm 
-    first_beats_length = len(re.sub("[^X\.]", '', pattern[pattern.keys()[0]]))
+def create_music(bank, pattern, bpm, ratio=2):
+    beat_duration = 60000 / bpm / ratio
+    first_beats_length = len(re.sub("[^X\.=]", '', pattern[pattern.keys()[0]]))
     total_duration = first_beats_length * beat_duration
 
     music = AudioSegment.silent(duration=total_duration)
 
     for instr,beats in pattern.items():
-        beats = re.sub("[^X\.]", '', beats)
-        sample = bank[instr]
+        beats = re.sub("[^X\.=]", '', beats)
+        last_play_position = None
         for i in range(len(beats)):
             if beats[i] == 'X':
+                last_play_position = int(i)
+                if i+1 < len(beats) and beats[i+1] == '=':
+                    sample = bank[instr][:beat_duration]
+                else:
+                    sample = bank[instr][0:]
                 position = i * beat_duration
                 music = music.overlay(sample, position=position)
+            elif beats[i] == '=':
+                counter = 0
+                while counter + i < len(beats) and beats[counter+i] == '=':
+                    counter += 1
+                counter += i
+                position = i * beat_duration
+                sample_begin_time = len(bank[instr]) / counter * i - (last_play_position)
+                sample_end_time = sample_begin_time + beat_duration
+                sample = bank[instr][sample_begin_time:sample_end_time]
+                music = music.overlay(sample, position=position)
+            else:
+                last_play_position = None
 
     return music
 
@@ -48,9 +65,10 @@ def main():
     samples = score['samples']
     pattern = score['pattern']
     bpm = score['bpm']
+    ratio = score.get('ratio') or 2
 
     bank = load_samples(samples)
-    music = create_music(bank, pattern, bpm)
+    music = create_music(bank, pattern, bpm, ratio)
 
     play(music)
 
