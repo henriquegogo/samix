@@ -43,9 +43,9 @@ def create_music(bank, pattern, bpm, ratio=2):
                 counter = 0
                 while counter + i < len(beats) and beats[counter+i] == '=':
                     counter += 1
-                counter += i
+                counter += i - last_play_position
                 position = i * beat_duration
-                sample_begin_time = len(bank[instr]) / counter * i - (last_play_position)
+                sample_begin_time = (len(bank[instr]) / counter) * (i - last_play_position)
                 sample_end_time = sample_begin_time + beat_duration
                 sample = bank[instr][sample_begin_time:sample_end_time]
                 music = music.overlay(sample, position=position)
