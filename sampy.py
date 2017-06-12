@@ -70,6 +70,12 @@ def main():
     bank = load_samples(samples)
     music = create_music(bank, pattern, bpm, ratio)
 
-    play(music)
+    if len(sys.argv) == 2:
+        play(music)
+    else:
+        export_path = sys.argv[2]
+        extension = export_path.split('.')[1]
+        music.export(export_path, format=extension)
+        print('Song ' + export_path + ' created with success.')
 
 if __name__ == '__main__': main()
