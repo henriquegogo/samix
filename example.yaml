@@ -2,13 +2,22 @@ title: Drum Machine
 bpm: 120
 
 samples:
-  audio: AC_DC - Highway to Hell.mp3
-  kick:  audio[10701:10937]
-  snare: audio[10185:10679]
+  audio:  AC_DC - Highway to Hell.mp3
+  kick:   audio[10701:10937]
+  snare:  audio[10185:10679]
+  guitar: audio[800:2010]
 
-pattern:
-  kick:  X...|X...|X...|X..X
-         X...|X...|X...|X..X
+patterns:
+  drums:
+    kick:   X...|X...|X...|X..X
+            X.X.|X...|X.X.|X..X
+    snare:  ..X.|..X.|..X.|..X.
+            ..X.|..X.|..X.|..X.
+  riff:
+    guitar: ..X.|..XX
 
-  snare: ..X.|..X.|..X.|..X.
-         ..X.|..X.|..X.|..X.
+song:
+  drums:    X...|....|....|....
+            ....|....|....|....
+  riff:     X...|....|X...|....
+            X...|....|X...|....

@@ -20,7 +20,11 @@ def load_samples(samples):
 
     return bank
 
-def create_music(bank, pattern, bpm, ratio=2):
+def registry_patterns(bank, patterns, bpm, ratio):
+    for name,pattern in patterns.items():
+        bank[name] = create_pattern(bank, pattern, bpm, ratio)
+
+def create_pattern(bank, pattern, bpm, ratio):
     beat_duration = 60000 / bpm / ratio
     first_beats_length = len(re.sub("[^X\.=]", '', pattern[pattern.keys()[0]]))
     total_duration = first_beats_length * beat_duration
@@ -63,12 +67,14 @@ def main():
     score = yaml.load(score_content)
 
     samples = score['samples']
-    pattern = score['pattern']
+    patterns = score['patterns']
+    song = score['song']
     bpm = score['bpm']
     ratio = score.get('ratio') or 2
 
     bank = load_samples(samples)
-    music = create_music(bank, pattern, bpm, ratio)
+    registry_patterns(bank, patterns, bpm, ratio)
+    music = create_pattern(bank, song, bpm, ratio)
 
     if len(sys.argv) == 2:
         play(music)
