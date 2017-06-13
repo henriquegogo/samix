@@ -63,7 +63,13 @@ def main():
     if len(sys.argv) <= 1: sys.exit('YAML file missing. Please type as command line argument.')
         
     yaml_path = sys.argv[1]
-    score_content = file(yaml_path, 'r').read()
+
+    try:
+        score_content = file(yaml_path, 'r').read()
+    except:
+        print('File ' + yaml_path + ' does not exist') 
+        return 0
+
     score = yaml.load(score_content)
 
     samples = score['samples']
