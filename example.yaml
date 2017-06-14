@@ -3,8 +3,8 @@ bpm: 180
 
 samples:
   audio:  AC_DC - Highway to Hell.mp3
-  kick:   audio[10701:10937]
-  snare:  audio[10185:10679]
+  kick:   audio[10701:10937]*2
+  snare:  audio[10185:10679] * 1.8
   guitar: audio[800:2010]
   vocal:  audio[181220:186905]
 

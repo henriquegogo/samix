@@ -5,23 +5,30 @@ from pydub.playback import play
 
 def load_samples(samples):
     bank = {}
-    for instr,path in reversed(samples.items()):
+    for instr,path in samples.items():
         if path.find('[') < 0:
-            path_ext = path.split('.')[-1]
-            bank[instr] = AudioSegment.from_file(path, format=path_ext)
+            regex_match = re.search('(^.*?)\.(\w*)\s*\*?(.*)$', path)
+            file_path = regex_match.group(1) + '.' + regex_match.group(2)
+            path_ext = regex_match.group(2)
+            bank[instr] = AudioSegment.from_file(file_path, format=path_ext)
+            speed_rate = float(regex_match.group(3) or 1)
+            bank[instr].frame_rate = int(bank[instr].frame_rate * speed_rate)
 
-    for instr,path in reversed(samples.items()):
+    for instr,path in samples.items():
         if path.find('[') > 0:
-            source_instr = path.split('[')[0]
-            source_range = path.split('[')[1][:-1].split(':')
+            regex_match = re.search('(^\w*)\[(.*)\]\s*\*?(.*)$', path)
+            source_instr = regex_match.group(1)
+            source_range = regex_match.group(2).split(':')
             source_begin_time = int(source_range[0])
             source_end_time = int(source_range[1])
             bank[instr] = bank[source_instr][source_begin_time:source_end_time] 
+            speed_rate = float(regex_match.group(3) or 1)
+            bank[instr].frame_rate = int(bank[instr].frame_rate * speed_rate)
 
     return bank
 
 def registry_patterns(bank, patterns, bpm, ratio):
-    for name,pattern in reversed(patterns.items()):
+    for name,pattern in patterns.items():
         bank[name] = create_pattern(bank, pattern, bpm, ratio)
 
 def create_pattern(bank, pattern, bpm, ratio):
