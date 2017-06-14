@@ -5,12 +5,12 @@ from pydub.playback import play
 
 def load_samples(samples):
     bank = {}
-    for instr,path in samples.items():
+    for instr,path in reversed(samples.items()):
         if path.find('[') < 0:
             path_ext = path.split('.')[-1]
             bank[instr] = AudioSegment.from_file(path, format=path_ext)
 
-    for instr,path in samples.items():
+    for instr,path in reversed(samples.items()):
         if path.find('[') > 0:
             source_instr = path.split('[')[0]
             source_range = path.split('[')[1][:-1].split(':')
@@ -21,7 +21,7 @@ def load_samples(samples):
     return bank
 
 def registry_patterns(bank, patterns, bpm, ratio):
-    for name,pattern in patterns.items():
+    for name,pattern in reversed(patterns.items()):
         bank[name] = create_pattern(bank, pattern, bpm, ratio)
 
 def create_pattern(bank, pattern, bpm, ratio):
