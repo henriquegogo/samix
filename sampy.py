@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import re, sys
 import yaml
 from pydub import AudioSegment
