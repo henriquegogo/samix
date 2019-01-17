@@ -79,7 +79,7 @@ def main():
         print('File ' + yaml_path + ' does not exist') 
         return 0
 
-    score = yaml.load(score_content)
+    score = yaml.safe_load(score_content)
 
     samples = score['samples']
     patterns = score['patterns']
