@@ -38,6 +38,7 @@ You can use '=' symbol if want to fit the sample inside de measurement.
 
 - X symbol will shot the sample or pattern
 - = symbol will slice sample or pattern proportionally and fit in measurement
+- - symbol stops sound
 
 ```yaml
 song:
