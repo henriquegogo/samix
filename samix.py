@@ -70,13 +70,12 @@ def create_pattern(bank, pattern, bpm, ratio):
 
 def main():
     if len(sys.argv) <= 1: sys.exit('YAML file missing. Please type as command line argument.')
-        
     yaml_path = sys.argv[1]
 
     try:
-        score_content = file(yaml_path, 'r').read()
+        score_content = open(yaml_path, 'r').read()
     except:
-        print('File ' + yaml_path + ' does not exist') 
+        print('File ' + yaml_path + ' does not exist')
         return 0
 
     score = yaml.safe_load(score_content)
