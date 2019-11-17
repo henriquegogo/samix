@@ -13,19 +13,16 @@ def load_samples(samples):
             file_path = regex_match.group(1) + '.' + regex_match.group(2)
             path_ext = regex_match.group(2)
             bank[instr] = AudioSegment.from_file(file_path, format=path_ext)
-            speed_rate = float(regex_match.group(3) or 1)
-            bank[instr].frame_rate = int(bank[instr].frame_rate * speed_rate)
-
-    for instr,path in samples.items():
-        if path.find('[') > 0:
+        elif path.find('[') > 0:
             regex_match = re.search('(^\w*)\[(.*)\]\s*\*?(.*)$', path)
             source_instr = regex_match.group(1)
             source_range = regex_match.group(2).split(':')
             source_begin_time = int(source_range[0])
             source_end_time = int(source_range[1])
             bank[instr] = bank[source_instr][source_begin_time:source_end_time]
-            speed_rate = float(regex_match.group(3) or 1)
-            bank[instr].frame_rate = int(bank[instr].frame_rate * speed_rate)
+
+        speed_rate = float(regex_match.group(3) or 1)
+        bank[instr].frame_rate = int(bank[instr].frame_rate * speed_rate)
 
     return bank
 
@@ -35,32 +32,35 @@ def registry_patterns(bank, patterns, bpm, ratio):
 
 def create_pattern(bank, pattern, bpm, ratio):
     beat_duration = 60000 / bpm / ratio
-    first_beats_length = len(re.sub("[^X\.=]", '', pattern[list(pattern)[0]]))
+    first_beats_length = len(re.sub("[^X\.=-]", '', pattern[list(pattern)[0]]))
     total_duration = first_beats_length * beat_duration
 
     music = AudioSegment.silent(duration=total_duration)
 
     for instr,beats in pattern.items():
-        beats = re.sub("[^X\.=]", '', beats)
+        beats = re.sub("[^X\.=-]", '', beats)
         last_play_position = None
         for i in range(len(beats)):
+            position = i * beat_duration
             if beats[i] == 'X':
                 last_play_position = int(i)
-                if i+1 < len(beats) and beats[i+1] == '=':
+                if i+1 < len(beats) and (beats[i+1] == '=' or beats[i+1] == '-'):
                     sample = bank[instr][:beat_duration]
                 else:
                     sample = bank[instr][0:]
-                position = i * beat_duration
-                music = music.overlay(sample, position=position)
             elif beats[i] == '=':
                 counter = 0
                 while counter + i < len(beats) and beats[counter+i] == '=':
                     counter += 1
                 counter += i - last_play_position
-                position = i * beat_duration
                 sample_begin_time = (len(bank[instr]) / counter) * (i - last_play_position)
                 sample_end_time = sample_begin_time + beat_duration
                 sample = bank[instr][sample_begin_time:sample_end_time]
+            elif beats[i] == '-':
+                sample_begin_time = (i - last_play_position) * beat_duration
+                sample_end_time = sample_begin_time + beat_duration
+                sample = bank[instr][sample_begin_time:sample_end_time]
+            if beats[i] != '.':
                 music = music.overlay(sample, position=position)
             else:
                 last_play_position = None
