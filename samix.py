@@ -23,7 +23,7 @@ def load_samples(samples):
             source_range = regex_match.group(2).split(':')
             source_begin_time = int(source_range[0])
             source_end_time = int(source_range[1])
-            bank[instr] = bank[source_instr][source_begin_time:source_end_time] 
+            bank[instr] = bank[source_instr][source_begin_time:source_end_time]
             speed_rate = float(regex_match.group(3) or 1)
             bank[instr].frame_rate = int(bank[instr].frame_rate * speed_rate)
 
@@ -35,7 +35,7 @@ def registry_patterns(bank, patterns, bpm, ratio):
 
 def create_pattern(bank, pattern, bpm, ratio):
     beat_duration = 60000 / bpm / ratio
-    first_beats_length = len(re.sub("[^X\.=]", '', pattern[pattern.keys()[0]]))
+    first_beats_length = len(re.sub("[^X\.=]", '', pattern[list(pattern)[0]]))
     total_duration = first_beats_length * beat_duration
 
     music = AudioSegment.silent(duration=total_duration)
@@ -81,7 +81,7 @@ def main():
     score = yaml.safe_load(score_content)
 
     samples = score['samples']
-    patterns = score['patterns']
+    patterns = score.get('patterns') or {}
     song = score['song']
     bpm = score['bpm']
     ratio = score.get('ratio') or 2
